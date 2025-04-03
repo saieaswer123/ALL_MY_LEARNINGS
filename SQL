@@ -1,0 +1,87 @@
+use imdb;
+
+
+show tables;
+select * from movies_genres;
+select distinct genre from movies_genres;
+select name,year,rankscore from movies where rankscore is not null and rankscore=9 order by year,rankscore;
+
+select * from movies_genres where genre in ('comedy','horror');
+
+select * from actors where first_name like 'Tis%';
+select * from actors where first_name like '%mes';
+select * from actors where first_name like '%es%';
+
+select * from movies where year between 1999 and 2000 order by year asc limit 1 offset 2;
+select rankscore,name from movies limit 20;
+select rankscore,name from movies limit 20 offset 10;
+describe actors;
+
+select id,name from movies;
+select name,id from movies;
+select min(year) from movies;
+select max(year) from movies;
+select avg(rankscore) from movies;
+select count(year) from movies;
+select count(distinct year) from movies;
+select count(*) from movies where year > 2003;
+select sum(rankscore) from movies ;
+
+select *,row_number() over (order by rankscore desc) as 'row_number' from movies;
+select *,row_number() over (partition by year order by rankscore desc) as 'row_number' from movies;
+select *,row_number() over (order by rankscore desc) as 'row_number' from movies;
+
+
+select *,rank() over(order by rankscore desc) as 'rank',dense_rank() over(order by rankscore desc) as 'dense_rank' from  movies;
+
+
+select year,count(year) from movies group by year order by year;
+
+select year,count(year) as 'year_count' from movies group by year order by year;
+select year,count(year) year_count from movies group by year order by year;
+select rankscore,count(rankscore) from movies group by rankscore order by rankscore desc ;
+
+
+select count(*) from movies where rankscore is not null;
+select count(*) from movies where rankscore is null;
+
+select year,count(year) count from movies group by year having count>1000;
+
+
+select m.name,mg.genre from movies m join movies_genres mg on m.id=mg.movie_id;
+
+
+
+SELECT * FROM movies WHERE rankscore >= max(rankscore);
+
+
+
+select * from movies where rankscore >= all(select max(rankscore) from movies);
+
+
+
+select first_name,last_name from actors where id in (select actor_id from roles where movie_id in (select id from movies where name='Die Hard 4.0'));
+
+
+insert into movies (id,name,year,rankscore) values (412350,'Thor',2011,7);
+select * from movies where id=412352;
+
+
+update movies set id=412352 where id=412351;
+
+
+
+select genre, director_id, prob from (select genre, director_id, prob, dense_rank() over (partition by genre order by prob desc) as 'second' from directors_genres) as a where second=2 ;
+
+
+
+SELECT genre, director_id, prob
+FROM (
+    SELECT director_id, genre, prob, 
+           DENSE_RANK() OVER (PARTITION BY genre ORDER BY prob DESC) AS second
+    FROM directors_genres
+) AS a 
+WHERE second = 2
+ORDER BY genre, prob DESC;
+
+
